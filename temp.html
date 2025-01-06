@@ -1,0 +1,272 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Display a fixed-sized test ad." />
+  <title>Display a test ad</title>
+
+  <script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>
+  <script>
+    window.googletag = window.googletag || {cmd: []};
+    googletag.cmd.push(function() {
+      googletag.defineSlot('/19981519/Test', [300, 250], 'div-gpt-ad-1727820921199-0').addService(googletag.pubads());
+      googletag.pubads().enableSingleRequest();
+      googletag.enableServices();
+    });
+  </script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      overflow: hidden;
+      position: relative;
+      background-color: rgba(0, 0, 0, 0); /* fully transparent */
+      perspective: 1000px;  /* Perspective for 3D flip effect will be 2D if removed */
+    }
+
+    .bottom-banner {
+      width: 300px;
+      height: 178px;
+      background-color: transparent;
+      background-image: url('./assets/image.webp');
+      background-size: contain;
+      background-repeat: no-repeat;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: fixed;
+      bottom: 0px;
+      left: 50%;
+      transform: translateX(-50%);
+      transition: bottom 0.5s ease, opacity 0.5s ease, transform 0.6s ease;
+      opacity: 1;
+      transform-style: preserve-3d;
+      backface-visibility: hidden;
+    }
+
+    .fade-out {
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+    }
+
+    .flipped {
+      transform: translateX(-50%) rotateY(360deg);  
+      transition: transform 0.6s ease;
+    }
+
+    .flip-fade-out {
+      transform: translateX(-50%) rotateY(360deg);
+      opacity: 0;
+      transition: transform 0.6s ease, opacity 0.4s ease;
+    }
+
+    .flip-fade-in {
+      transform: translateX(-50%) rotateY(0deg);
+      opacity: 1;
+      transition: transform 0.6s ease, opacity 0.5s ease;
+    }
+
+    .effect-shine {
+      -webkit-mask-image: linear-gradient(-65deg, #fff 30%, rgba(255,255,255,.6) 50%, #fff 70%);
+      -webkit-mask-size: 200%;
+      animation: shine 2s infinite;
+    }
+
+    @-webkit-keyframes shine {
+      from {
+        -webkit-mask-position: 150%;
+      }
+      to {
+        -webkit-mask-position: -50%;
+      }
+    }
+
+    .blur {
+      filter: blur(5px);
+      transition: filter 0.5s ease;
+    }
+
+    .rotate {
+      transform: translateX(-50%) rotate(360deg);
+      transition: transform 1s ease;
+    }
+
+    .zoom {
+      transform: translateX(-50%) scale(1.5);
+      transition: transform 0.5s ease;
+    }
+
+    .controls {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+    }
+
+    button {
+      margin: 5px;
+      padding: 10px 15px;
+      background-color: #333;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    button:hover {
+      background-color: #3c70f5;
+    }
+  </style>
+</head>
+<body>
+
+<div class="controls">
+  <button id="slide-btn">Slide</button>
+  <button id="fade-btn">Fade</button>
+  <button id="flip-btn">Flip</button>
+  <button id="flip-fade-btn">Flip/Fade</button>
+  <button id="shine-btn">Shine</button>
+  <button id="blur-btn">Blur</button>
+  <button id="rotate-btn">Rotate</button>
+  <button id="zoom-btn">Zoom</button>
+</div>
+
+<div id="div-gpt-ad-1727820921199-0" class="bottom-banner">
+  <script>
+    googletag.cmd.push(function() { googletag.display('div-gpt-ad-1727820921199-0'); });
+  </script>
+</div>
+
+<script type="text/javascript">
+ document.addEventListener('DOMContentLoaded', () => {
+  const bottomBanner = document.querySelector('.bottom-banner');
+  const slideBtn = document.getElementById('slide-btn');
+  const fadeBtn = document.getElementById('fade-btn');
+  const flipBtn = document.getElementById('flip-btn');
+  const flipFadeBtn = document.getElementById('flip-fade-btn');
+  const shineBtn = document.getElementById('shine-btn');
+  const blurBtn = document.getElementById('blur-btn');
+  const rotateBtn = document.getElementById('rotate-btn');
+  const zoomBtn = document.getElementById('zoom-btn');
+
+  let isBannerVisible = true; // Start the banner visible at the bottom
+  let isFlipped = false; // Tracks if the banner is flipped
+  let isFlipFadeVisible = true; // Tracks the visibility state for flip-fade
+  let isShineActive = false; // Tracks the shine state
+  let isFadedOut = false; // Tracks fade-out state
+  let isBlurred = false; // Tracks blur state
+  let isRotated = false; // Tracks rotation state
+  let isZoomed = false; // Tracks zoom state
+
+  // Reset the banner to its default state to avoid conflicts when switching effects
+  function resetBanner() {
+    bottomBanner.style.bottom = '0'; // Always reset to visible at the bottom
+    bottomBanner.classList.remove('flipped'); // Remove flip class
+    bottomBanner.classList.remove('flip-fade-out'); // Remove flip-fade-out class
+    bottomBanner.classList.remove('flip-fade-in'); // Remove flip-fade-in class
+    bottomBanner.classList.remove('fade-out'); // Remove fade-out class
+    bottomBanner.classList.remove('effect-shine'); // Remove shine effect
+    bottomBanner.classList.remove('blur'); // Remove blur effect
+    bottomBanner.classList.remove('rotate'); // Remove rotation effect
+    bottomBanner.classList.remove('zoom'); // Remove zoom effect
+  }
+
+  // Slide functionality
+  slideBtn.addEventListener('click', () => {
+    resetBanner();
+    if (isBannerVisible) {
+      bottomBanner.style.bottom = '-250px'; // Slide out
+    } else {
+      bottomBanner.style.bottom = '0'; // Slide in
+    }
+    isBannerVisible = !isBannerVisible; // Toggle the visibility state
+  });
+
+  // Fade functionality (only using fade-out class)
+  fadeBtn.addEventListener('click', () => {
+    resetBanner();
+    if (isFadedOut) {
+      bottomBanner.classList.remove('fade-out'); // Fade back in by removing fade-out
+    } else {
+      bottomBanner.classList.add('fade-out'); // Fade out by adding fade-out
+    }
+    isFadedOut = !isFadedOut; // Toggle the fade state
+  });
+
+  // Flip functionality (360 degrees)
+  flipBtn.addEventListener('click', () => {
+    resetBanner();
+    if (isFlipped) {
+      bottomBanner.classList.remove('flipped'); // Reset flip
+    } else {
+      bottomBanner.classList.add('flipped'); // Flip it
+    }
+    isFlipped = !isFlipped; // Toggle the flipped state
+  });
+
+  // Flip/Fade functionality (combine both)
+  flipFadeBtn.addEventListener('click', () => {
+    resetBanner();
+    if (isFlipFadeVisible) {
+      bottomBanner.classList.remove('flip-fade-in'); // Remove fade-in first
+      bottomBanner.classList.add('flip-fade-out'); // Apply flip and fade out
+    } else {
+      bottomBanner.classList.remove('flip-fade-out'); // Remove fade-out first
+      bottomBanner.classList.add('flip-fade-in'); // Apply flip and fade in
+    }
+    isFlipFadeVisible = !isFlipFadeVisible; // Toggle visibility state for flip-fade
+  });
+
+  // Shine functionality
+  shineBtn.addEventListener('click', () => {
+    resetBanner();
+    if (isShineActive) {
+      bottomBanner.classList.remove('effect-shine'); // Remove shine effect
+    } else {
+      bottomBanner.classList.add('effect-shine'); // Apply shine effect
+    }
+    isShineActive = !isShineActive; // Toggle shine state
+  });
+
+  // Blur functionality
+  blurBtn.addEventListener('click', () => {
+    resetBanner();
+    if (isBlurred) {
+      bottomBanner.classList.remove('blur'); // Remove blur effect
+    } else {
+      bottomBanner.classList.add('blur'); // Apply blur effect
+    }
+    isBlurred = !isBlurred; // Toggle blur state
+  });
+
+  // Rotate functionality
+  rotateBtn.addEventListener('click', () => {
+    resetBanner();
+    if (isRotated) {
+      bottomBanner.classList.remove('rotate'); // Remove rotation effect
+    } else {
+      bottomBanner.classList.add('rotate'); // Apply rotation effect
+    }
+    isRotated = !isRotated; // Toggle rotation state
+  });
+
+  // Zoom functionality
+  zoomBtn.addEventListener('click', () => {
+    resetBanner();
+    if (isZoomed) {
+      bottomBanner.classList.remove('zoom'); // Remove zoom effect
+    } else {
+      bottomBanner.classList.add('zoom'); // Apply zoom effect
+    }
+    isZoomed = !isZoomed; // Toggle zoom state
+  });
+});
+
+</script>
+</body>
+</html>

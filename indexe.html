@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TV Screen</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #d3d3d3; /* White background */
+            margin: 0;
+            padding: 0;
+            width: 100%;
+        }
+
+        .tv {
+            background-color: black;
+            width: 100%;
+            height: 85%;
+            max-width: 1200px;
+            max-height: 800px;
+            background-color: transparent; /* Black background inside TV */
+            border: 20px solid black; /* Light gray border */
+            border-radius: 15px;
+            position: relative;
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            box-sizing: border-box;
+            border-radius: 0px;
+        }
+
+        .rectangle {
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20%;
+            height: 15px;
+            background-color: black; /* Black color to match the TV frame */
+            border-bottom-right-radius: 10px;
+            border-bottom-left-radius: 10px;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 92%; /* Make sure this does not cover the video controls */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 2vw; /* Responsive font size */
+            font-family: Arial, sans-serif;
+            opacity: 1; /* Make the ad visible */
+            pointer-events: none; /* Make the overlay non-interactive */
+            transition: opacity 0.5s ease; /* Smooth transition for fading in */
+        }
+
+        .ad-content {
+            width: 100%;
+            max-width: 100%;
+            height: 100%;
+            background: transparent; /* Remove background */
+            pointer-events: none; /* Make the ad content non-interactive */
+        }
+
+        .ad-content iframe {
+            width: 100%;
+            height: 100%;
+            border: none; /* Remove iframe border */
+            background: transparent; /* Ensure iframe background is transparent */
+            pointer-events: all; /* Keep the iframe interactive */
+        }
+    </style>
+</head>
+<body>
+    <div class="tv">
+        <video class="screen" controls>
+            <source src="./assets/video.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div class="rectangle"></div> <!-- Rectangle shape at the bottom -->
+        <div class="overlay" id="ad-overlay">
+            <div class="ad-content">
+                <iframe id="ad-iframe" frameborder="0" allow="autoplay; encrypted-media" title="Ad"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // VAST XML
+        const vastXML = `
+        <VAST version="4.2" xmlns="http://www.iab.com/VAST">
+            <Ad id="20005" sequence="1">
+                <InLine>
+                    <AdSystem version="1">iabtechlab</AdSystem>
+                    <Error>
+                        <![CDATA[https://example.com/error]]>
+                    </Error>
+                    <Extensions>
+                        <Extension type="iab-Count">
+                            <total_available>
+                                <![CDATA[ 2 ]]>
+                            </total_available>
+                        </Extension>
+                    </Extensions>
+                    <Impression id="Impression-ID">
+                        <![CDATA[https://example.com/track/impression]]>
+                    </Impression>
+                    <Pricing model="cpm" currency="USD">
+                        <![CDATA[ 25.00 ]]>
+                    </Pricing>
+                    <AdServingId>a532d16d-4d7f-4440-bd29-2ec0e693fc80</AdServingId>
+                    <AdTitle>
+                        <![CDATA[VAST 4.0 Pilot - Scenario 5]]>
+                    </AdTitle>
+                    <Creatives>
+                        <Creative id="5480" sequence="1" adId="2447226">
+                            <NonLinearAds>
+                                <NonLinear width="940" height="356">
+                                    <IFrameResource>
+                                        <![CDATA[http://127.0.0.1:5500/temp.html]]>
+                                    </IFrameResource>
+                                    <NonLinearClickThrough>
+                                        <![CDATA[https://iabtechlab.com]]>
+                                    </NonLinearClickThrough>
+                                    <NonLinearClickTracking>
+                                        <![CDATA[https://example.com/tracking/clickTracking]]>
+                                    </NonLinear>
+                                </NonLinearAds>
+                                <UniversalAdId idRegistry="Ad-ID">8465</UniversalAdId>
+                            </Creative>
+                        </Creatives>
+                        <Description>
+                            <![CDATA[VAST 4.0 sample tag for Non Linear ad (i.e Overlay ad). Change the StaticResources to have a tag with your own content. Change NonLinear tag's parameters accordingly to view desired results.]]>
+                        </Description>
+                    </InLine>
+                </Ad>
+            </VAST>
+        `;
+
+        // Parsing the VAST XML and setting the ad URL
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(vastXML, "application/xml");
+        const iframeResource = xmlDoc.querySelector("IFrameResource").textContent;
+
+        // Setting the iframe src to the ad URL
+        document.getElementById('ad-iframe').src = iframeResource;
+
+        // Display the ad overlay on page load
+        document.getElementById('ad-overlay').style.display = 'block';
+    </script>
+</body>
+</html>
